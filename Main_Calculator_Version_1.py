@@ -131,35 +131,31 @@ class calculator:
             case 4,4:
                 pass
             case 5,0:
-                pos = len(self.Equationbox.get(1.0, "1.0 lineend"))
-                end = float("1."+str(pos)) 
-                self.Equationbox.insert(end,"1")
+                self.Equationbox.insert("insert","1")
             case 5,1:
-                pos = len(self.Equationbox.get(1.0, "1.0 lineend"))
-                end = float("1."+str(pos))
-                self.Equationbox.insert(end,"2")
+                self.Equationbox.insert("insert","2")
             case 5,2:
-                self.Equationbox.insert(1.0,"3")
+                self.Equationbox.insert("insert","3")
             case 5,3:
                 pass
             case 5,4:
                 pass
             case 6,0:
-                self.Equationbox.insert(1.0,"4")
+                self.Equationbox.insert("insert","4")
             case 6,1:
-                self.Equationbox.insert(1.0,"5")
+                self.Equationbox.insert("insert","5")
             case 6,2:
-                self.Equationbox.insert(1.0,"6")
+                self.Equationbox.insert("insert","6")
             case 6,3:
                 pass
             case 6,4:
                 pass
             case 7,0:
-                self.Equationbox.insert(1.0,"7")
+                self.Equationbox.insert("insert","7")
             case 7,1:
-                self.Equationbox.insert(1.0,"8")
+                self.Equationbox.insert("insert","8")
             case 7,2:
-                self.Equationbox.insert(1.0,"9")
+                self.Equationbox.insert("insert","9")
             case 7,3:
                 pass
             case 7,4:
