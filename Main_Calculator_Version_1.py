@@ -159,9 +159,17 @@ class calculator:
             case 7,3:
                 self.Equationbox.delete(INSERT + "-1c")
             case 7,4:
-                equation = self.Equationbox.get(1.0, "end-1c")
+                equation = self.Equationbox.get(1.0, "1.0 lineend")
+                equation_f = list(str(equation))
+                for i in equation_f:
+                    if i == "X":
+                        equation_f[equation_f.index(i)] = "*"
+                    elif i == "÷":
+                        equation_f[equation_f.index(i)] = "/"
+                equation_f = "".join(equation_f)
                 
-                self.Equationbox.insert("4.end", eval(equation))
+                
+                self.Equationbox.insert("4.end", eval(equation_f))
             case 8,0:
                 pass
             case 8,1:
