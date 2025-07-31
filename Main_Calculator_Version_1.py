@@ -137,9 +137,9 @@ class calculator:
             case 5,2:
                 self.Equationbox.insert("insert","3")
             case 5,3:
-                pass
+                self.Equationbox.insert("insert","X")
             case 5,4:
-                pass
+                self.Equationbox.insert("insert","÷")
             case 6,0:
                 self.Equationbox.insert("insert","4")
             case 6,1:
@@ -147,9 +147,9 @@ class calculator:
             case 6,2:
                 self.Equationbox.insert("insert","6")
             case 6,3:
-                pass
+                self.Equationbox.insert("insert","+")
             case 6,4:
-                pass
+                self.Equationbox.insert("insert","-")
             case 7,0:
                 self.Equationbox.insert("insert","7")
             case 7,1:
@@ -157,9 +157,11 @@ class calculator:
             case 7,2:
                 self.Equationbox.insert("insert","9")
             case 7,3:
-                pass
+                self.Equationbox.delete(INSERT + "-1c")
             case 7,4:
-                pass
+                equation = self.Equationbox.get(1.0, "end-1c")
+                
+                self.Equationbox.insert("4.end", eval(equation))
             case 8,0:
                 pass
             case 8,1:
@@ -173,9 +175,13 @@ class calculator:
         frame.columnconfigure([0,1,2,3,4], weight=1, minsize=60)
 
         # Where the equation will be written
-        self.Equationbox = Text(frame, width=40, height=2)
-        self.Equationbox.grid(row=0, columnspan=8,pady=5, padx=5)
-
+        self.Equationbox = Text(frame, width=40, height=4, wrap="none")
+        self.Equationbox.grid(row=0, columnspan=5,pady=10, padx=5)
+        # Textbox lines are generated dynamicaly so to have them exist when I want to add the answer I need to create them
+        self.Equationbox.insert(2.0, "\n")
+        self.Equationbox.insert(3.0, "\n")
+        self.Equationbox.insert(4.0, "\n")
+        self.Equationbox.mark_set("insert", 1.0)
 
         # Creates the main mass of buttons
         for i in range(1, 5):
