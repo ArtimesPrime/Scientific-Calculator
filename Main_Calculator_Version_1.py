@@ -21,43 +21,46 @@ class calculator:
 
         # Dictionary of the unique identifier of each button and its label.
         self.Labels = {
-            "10": "\u221A",
-            "11": "x\u00B2",
-            "12": "Log",
-            "13": "Menu",
-            "14": "F<->D",
-            "20": "\u00B2\u221A",
-            "21": "x\u02E3",
-            "22": "Ln",
-            "23": "(",
-            "24": ")",
-            "30": "sin",
-            "31": "cos",
-            "32": "tan",
-            "33": "π",
-            "34": "e",
-            "40": "sin\u207B\u00B9",
-            "41": "cos\u207B\u00B9",
-            "42": "tan\u207B\u00B9",
-            "43": "x/x",
-            "44": "AC",
-            "50": "1",
-            "51": "2",
-            "52": "3",
-            "53": "X",
-            "54": "÷",
-            "60": "4",
-            "61": "5",
-            "62": "6",
-            "63": "+",
-            "64": "-",
-            "70": "7",
-            "71": "8",
-            "72": "9",
-            "73": "DEL",
-            "74": "EXE",
-            "80": "0",
-            "81": "."}
+            (2, 0): "\u221A",
+            (2, 1): "x\u00B2",
+            (2, 2): "Log",
+            (2, 3): "Menu",
+            (2, 4): "F<->D",
+            (3, 0): "\u00B2\u221A",
+            (3, 1): "x\u02E3",
+            (3, 2): "Ln",
+            (3, 3): "(",
+            (3, 4): ")",
+            (4, 0): "sin",
+            (4, 1): "cos",
+            (4, 2): "tan",
+            (4, 3): "π",
+            (4, 4): "e",
+            (5, 0): "sin\u207B\u00B9",
+            (5, 1): "cos\u207B\u00B9",
+            (5, 2): "tan\u207B\u00B9",
+            (5, 3): "x/x",
+            (5, 4): "AC",
+            (6, 0): "1",
+            (6, 1): "2",
+            (6, 2): "3",
+            (6, 3): "X",
+            (6, 4): "÷",
+            (7, 0): "4",
+            (7, 1): "5",
+            (7, 2): "6",
+            (7, 3): "+",
+            (7, 4): "-",
+            (8, 0): "7",
+            (8, 1): "8",
+            (8, 2): "9",
+            (8, 3): "DEL",
+            (8, 4): "EXE",
+            (9, 0): "0",
+            (9, 1): "."}
+        
+        self.Answer = StringVar()
+        self.Answer.set("")
 
         # Creates the dictionary of the frames and creates the frames
         self.frames = {}
@@ -130,36 +133,37 @@ class calculator:
                 pass
             case 4,4:
                 pass
-            case 5,0:
-                self.Equationbox.insert("insert","1")
-            case 5,1:
-                self.Equationbox.insert("insert","2")
-            case 5,2:
-                self.Equationbox.insert("insert","3")
-            case 5,3:
-                self.Equationbox.insert("insert","X")
-            case 5,4:
-                self.Equationbox.insert("insert","÷")
             case 6,0:
-                self.Equationbox.insert("insert","4")
+                self.Equationbox.insert("insert","1")
             case 6,1:
-                self.Equationbox.insert("insert","5")
+                self.Equationbox.insert("insert","2")
             case 6,2:
-                self.Equationbox.insert("insert","6")
+                self.Equationbox.insert("insert","3")
             case 6,3:
-                self.Equationbox.insert("insert","+")
+                self.Equationbox.insert("insert","X")
             case 6,4:
-                self.Equationbox.insert("insert","-")
+                self.Equationbox.insert("insert","÷")
             case 7,0:
-                self.Equationbox.insert("insert","7")
+                self.Equationbox.insert("insert","4")
             case 7,1:
-                self.Equationbox.insert("insert","8")
+                self.Equationbox.insert("insert","5")
             case 7,2:
-                self.Equationbox.insert("insert","9")
+                self.Equationbox.insert("insert","6")
             case 7,3:
-                self.Equationbox.delete(INSERT + "-1c")
+                self.Equationbox.insert("insert","+")
             case 7,4:
-                equation = self.Equationbox.get(1.0, "1.0 lineend")
+                self.Equationbox.insert("insert","-")
+            case 8,0:
+                self.Equationbox.insert("insert","7")
+            case 8,1:
+                self.Equationbox.insert("insert","8")
+            case 8,2:
+                self.Equationbox.insert("insert","9")
+            case 8,3:
+                self.Equationbox.delete(INSERT + "-1c")
+                
+            case 8,4:
+                equation = self.Equationbox.get()
                 equation_f = list(str(equation))
                 for i in equation_f:
                     if i == "X":
@@ -167,61 +171,53 @@ class calculator:
                     elif i == "÷":
                         equation_f[equation_f.index(i)] = "/"
                 equation_f = "".join(equation_f)
+
                 
-                
-                self.Equationbox.insert("4.end", eval(equation_f))
-            case 8,0:
+                self.Answer.set(str(eval(equation_f)))
+            case 9,0:
                 pass
-            case 8,1:
+            case 9,1:
                 pass
     
     # The GUI of the main calculator
     def Main_Calculator(self):
         # Defining the frames properties
         frame = Frame(self.container)
-        frame.rowconfigure([0,1,2,3,4,5,6,7,8], weight=1, minsize=40)
+        frame.rowconfigure([0,1,2,3,4,5,6,7,8,9], weight=1, minsize=30)
         frame.columnconfigure([0,1,2,3,4], weight=1, minsize=60)
+        
 
         # Where the equation will be written
-        self.Equationbox = Text(frame, width=40, height=4, wrap="none")
-        self.Equationbox.grid(row=0, columnspan=5,pady=10, padx=5)
-        # Textbox lines are generated dynamicaly so to have them exist when I want to add the answer I need to create them
-        self.Equationbox.insert(2.0, "\n")
-        self.Equationbox.insert(3.0, "\n")
-        self.Equationbox.insert(4.0, "\n")
-        self.Equationbox.mark_set("insert", 1.0)
+        self.Equationbox = Entry(frame, width=50,)   
+        self.Equationbox.grid(row=0, columnspan=5, padx=5, pady=0, sticky = "NSEW")
+
+        self.Answerbox = Label(frame, textvariable= self.Answer, width=43, bg="White", anchor="e")
+        self.Answerbox.grid(row=1, columnspan=5, padx=5, pady=0,  sticky = "NSEW")
 
         # Creates the main mass of buttons
-        for i in range(1, 5):
+        for i in range(2, 6):
             for j in range(0,5):
-
-                # Creates the unqiue identifer for that button for its label.
-                Name = str(i) + str(j)
-                
-                self.CenterButtons = Button(frame, text=self.Labels[Name], width=5, command=lambda i=i, j=j: self.Operators(i, j))
-                self.CenterButtons.grid(row=i, column=j, pady=3)
+                self.CenterButtons = Button(frame, text=self.Labels[(i,j)], width=5, command=lambda i=i, j=j: self.Operators(i, j))
+                self.CenterButtons.grid(row=i, column=j, pady=6)
         
 
         # Creates the Side buttons
-        for i in range(5,8):
+        for i in range(6,9):
             for j in range(3,5):
-                Name = str(i) + str(j)
-                self.RightButtons = Button(frame, text=self.Labels[Name], width=5, command=lambda i=i, j=j: self.Operators(i, j))
+                self.RightButtons = Button(frame, text=self.Labels[(i,j)], width=5, command=lambda i=i, j=j: self.Operators(i, j))
                 self.RightButtons.grid(row=i, column=j, pady=3)
 
         
         # Creates the Numberpad
-        for i in range(5,8):
+        for i in range(6,9):
             for j in range(0,3):
-                Name = str(i) + str(j)
-                self.NumButtons = Button(frame, text=self.Labels[Name], width=5, height=2, command=lambda i=i, j=j: self.Operators(i, j))
+                self.NumButtons = Button(frame, text=self.Labels[(i,j)], width=5, height=2, command=lambda i=i, j=j: self.Operators(i, j))
                 self.NumButtons.grid(row=i, column=j, pady=3)
 
         # Creates the two buttons beneath the  numberpad.
-        for i in range(8,9):
+        for i in range(9,10):
             for j in range(0,2):
-                Name = str(i) + str(j)
-                self.PlaceButtons = Button(frame, text=self.Labels[Name], width=5, command=lambda i=i, j=j: self.Operators(i, j))
+                self.PlaceButtons = Button(frame, text=self.Labels[(i,j)], width=5, command=lambda i=i, j=j: self.Operators(i, j))
                 self.PlaceButtons.grid(row=i, column=j, pady=3)
 
         frame.grid(row=0, column=0)
