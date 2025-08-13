@@ -93,22 +93,12 @@ class calculator:
     # Contains the operations preform by each button
     def Operators(self,r,c):
         match(r,c):
-            case 1,0:
-                pass
-            case 1,1:
-                pass
-            case 1,2:
-                pass
-            case 1,3:
-                pass
-            case 1,4:
-                pass
             case 2,0:
                 pass
             case 2,1:
                 pass
             case 2,2:
-                pass
+                self.Equationbox.insert("insert","Log")
             case 2,3:
                 pass
             case 2,4:
@@ -120,9 +110,9 @@ class calculator:
             case 3,2:
                 pass
             case 3,3:
-                pass
+                self.Equationbox.insert("insert","(")
             case 3,4:
-                pass
+                self.Equationbox.insert("insert",")")
             case 4,0:
                 pass
             case 4,1:
@@ -130,9 +120,20 @@ class calculator:
             case 4,2:
                 pass
             case 4,3:
-                pass
+                self.Equationbox.insert("insert","π")
             case 4,4:
+                self.Equationbox.insert("insert","e")
+            case 5,0:
                 pass
+            case 5,1:
+                pass
+            case 5,2:
+                pass
+            case 5,3:
+                pass
+            case 5,4:
+                self.Equationbox.delete(0, END)
+                self.Answer.set("")
             case 6,0:
                 self.Equationbox.insert("insert","1")
             case 6,1:
@@ -160,7 +161,8 @@ class calculator:
             case 8,2:
                 self.Equationbox.insert("insert","9")
             case 8,3:
-                self.Equationbox.delete(INSERT + "-1c")
+                pos = self.Equationbox.index(INSERT)
+                self.Equationbox.delete(pos - 1)
                 
             case 8,4:
                 equation = self.Equationbox.get()
@@ -170,12 +172,32 @@ class calculator:
                         equation_f[equation_f.index(i)] = "*"
                     elif i == "÷":
                         equation_f[equation_f.index(i)] = "/"
+                    elif i == "π":
+                        equation_f[equation_f.index(i)] = str(math.pi)
+                    elif i == "e":
+                        equation_f[equation_f.index(i)] = str(math.e)
+                    elif i =="L":
+                        print(i)
+                        if equation_f[equation_f.index(i)+1] == "o":
+                            print("True")
+                            loged = ""
+                            for k in equation_f[equation_f.index(i) + 3: len(equation_f)]:
+                                print(k)
+                                if k.isdigit()== True:
+                                    loged += k
+                                else:
+                                    break
+                            print(loged)
+                            equation_f[equation_f.index(i):(equation_f.index(i)+2+len(loged))] == ""
+
+                            math.log10(int(loged)) 
+
                 equation_f = "".join(equation_f)
 
-                
+                print(equation_f)
                 self.Answer.set(str(eval(equation_f)))
             case 9,0:
-                pass
+                self.Equationbox.insert("insert","0")
             case 9,1:
                 pass
     
