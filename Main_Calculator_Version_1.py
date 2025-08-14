@@ -96,7 +96,7 @@ class calculator:
             case 2,0:
                 pass
             case 2,1:
-                pass
+                self.Equationbox.insert("insert","\u00B2")
             case 2,2:
                 self.Equationbox.insert("insert","Log")
             case 2,3:
@@ -104,11 +104,11 @@ class calculator:
             case 2,4:
                 pass
             case 3,0:
-                pass
+                self.Equationbox.insert("insert","\u00B2\u221A")
             case 3,1:
-                pass
+                self.Equationbox.insert("insert","^")
             case 3,2:
-                pass
+                self.Equationbox.insert("insert","Ln")
             case 3,3:
                 self.Equationbox.insert("insert","(")
             case 3,4:
@@ -167,35 +167,82 @@ class calculator:
             case 8,4:
                 equation = self.Equationbox.get()
                 equation_f = list(str(equation))
+                
                 for i in equation_f:
+                    position = equation_f.index(i)
                     if i == "X":
                         equation_f[equation_f.index(i)] = "*"
+
+
                     elif i == "÷":
                         equation_f[equation_f.index(i)] = "/"
+
+
                     elif i == "π":
                         equation_f[equation_f.index(i)] = str(math.pi)
+
+
                     elif i == "e":
                         equation_f[equation_f.index(i)] = str(math.e)
+
+
                     elif i =="L":
                         print(i)
                         if equation_f[equation_f.index(i)+1] == "o":
-                            print("True")
                             loged = ""
                             for k in equation_f[equation_f.index(i) + 3: len(equation_f)]:
-                                print(k)
                                 if k.isdigit()== True:
                                     loged += k
                                 else:
                                     break
                             print(loged)
-                            equation_f[equation_f.index(i):(equation_f.index(i)+2+len(loged))] == ""
+                            del equation_f[equation_f.index(i)+1:(equation_f.index(i)+3+len(loged))]
+                            equation_f[equation_f.index(i)] = str(math.log10(int(loged)))
+                        elif equation_f[equation_f.index(i)+1] == "n":
+                            loged = ""
+                            for k in equation_f[equation_f.index(i) + 2: len(equation_f)]:
+                                if k.isdigit()== True:
+                                    loged += k
+                                else:
+                                    break
+                            print(loged)
+                            del equation_f[equation_f.index(i)+1:(equation_f.index(i)+2+len(loged))]
+                            equation_f[equation_f.index(i)] = str(math.log(int(loged)))
+                    elif i == "\u00B2":
+                        equation_f[equation_f.index(i)] = "**2"
 
-                            math.log10(int(loged)) 
+
+                    elif i == "^":
+                        powered = ""
+                        for k in equation_f[equation_f.index(i) + 1: len(equation_f)]:
+                                if k.isdigit()== True:
+                                    powered += k
+                                else:
+                                    break
+                        del equation_f[equation_f.index(i)+1:(equation_f.index(i)+1+len(powered))]
+                        equation_f[equation_f.index(i)] = f"**{powered}"        
+
+
+                    elif i == "\u221A":
+                        if equation_f[equation_f.index(i)-1] == "\u00B2":
+                            squared = ""
+                            for k in equation_f[equation_f.index(i) + 1: len(equation_f)]:
+                                    if k.isdigit()== True:
+                                        squared += k
+                                    else:
+                                        break
+                            del equation_f[equation_f.index(i)+1:(equation_f.index(i)+1+len(squared))]
+                            equation_f[equation_f.index(i)] = str(math.sqrt(powered))
+
+
+
+
 
                 equation_f = "".join(equation_f)
 
                 print(equation_f)
                 self.Answer.set(str(eval(equation_f)))
+
             case 9,0:
                 self.Equationbox.insert("insert","0")
             case 9,1:
