@@ -166,8 +166,27 @@ class calculator:
                 self.Equationbox.delete(pos - 1)
                 
             case 8,4:
-                tokens = re.findall(r"\d+(?:\.\d+)?|sin|cos|tan|[+\-X/^()]", self.Equationbox.get())
-                print(tokens)
+                tokens = re.findall(r"\d+(?:\.\d+)?|sin|cos|tan|[-+÷X/^()]", self.Equationbox.get())
+                priority = {"+":1, "-":1, "÷":2, "X":2, "^":3 }
+                postfix = []
+                operators = []
+                for i in tokens:
+                    if i.isdigit() == True:
+                        postfix.append(i)
+                    elif i in priority:
+                        while operators and i in priority and  priority[operators[-1]] >= priority[i]:
+                            postfix.append(operators.pop)
+                        operators.append(i)
+                    elif i == "(":
+                        operators.append(i)
+                    elif i == ")":
+                        while operators[-1] != "(":
+                            postfix.append(operators.pop)
+                        operators.pop()
+                postfix += operators[::-1]
+                print(postfix)    
+
+
 
             case 9,0:
                 self.Equationbox.insert("insert","0")
