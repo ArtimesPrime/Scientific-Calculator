@@ -8,6 +8,7 @@ It will use for loops to create buttons and have a method of differentaiting whi
 
 from tkinter import *
 import math
+import re
 
 # The Class where all the calculator will be contained.
 class calculator:
@@ -165,83 +166,8 @@ class calculator:
                 self.Equationbox.delete(pos - 1)
                 
             case 8,4:
-                equation = self.Equationbox.get()
-                equation_f = list(str(equation))
-                
-                for i in equation_f:
-                    position = equation_f.index(i)
-                    if i == "X":
-                        equation_f[equation_f.index(i)] = "*"
-
-
-                    elif i == "÷":
-                        equation_f[equation_f.index(i)] = "/"
-
-
-                    elif i == "π":
-                        equation_f[equation_f.index(i)] = str(math.pi)
-
-
-                    elif i == "e":
-                        equation_f[equation_f.index(i)] = str(math.e)
-
-
-                    elif i =="L":
-                        print(i)
-                        if equation_f[equation_f.index(i)+1] == "o":
-                            loged = ""
-                            for k in equation_f[equation_f.index(i) + 3: len(equation_f)]:
-                                if k.isdigit()== True:
-                                    loged += k
-                                else:
-                                    break
-                            print(loged)
-                            del equation_f[equation_f.index(i)+1:(equation_f.index(i)+3+len(loged))]
-                            equation_f[equation_f.index(i)] = str(math.log10(int(loged)))
-                        elif equation_f[equation_f.index(i)+1] == "n":
-                            loged = ""
-                            for k in equation_f[equation_f.index(i) + 2: len(equation_f)]:
-                                if k.isdigit()== True:
-                                    loged += k
-                                else:
-                                    break
-                            print(loged)
-                            del equation_f[equation_f.index(i)+1:(equation_f.index(i)+2+len(loged))]
-                            equation_f[equation_f.index(i)] = str(math.log(int(loged)))
-                    elif i == "\u00B2":
-                        equation_f[equation_f.index(i)] = "**2"
-
-
-                    elif i == "^":
-                        powered = ""
-                        for k in equation_f[equation_f.index(i) + 1: len(equation_f)]:
-                                if k.isdigit()== True:
-                                    powered += k
-                                else:
-                                    break
-                        del equation_f[equation_f.index(i)+1:(equation_f.index(i)+1+len(powered))]
-                        equation_f[equation_f.index(i)] = f"**{powered}"        
-
-
-                    elif i == "\u221A":
-                        if equation_f[equation_f.index(i)-1] == "\u00B2":
-                            squared = ""
-                            for k in equation_f[equation_f.index(i) + 1: len(equation_f)]:
-                                    if k.isdigit()== True:
-                                        squared += k
-                                    else:
-                                        break
-                            del equation_f[equation_f.index(i)+1:(equation_f.index(i)+1+len(squared))]
-                            equation_f[equation_f.index(i)] = str(math.sqrt(powered))
-
-
-
-
-
-                equation_f = "".join(equation_f)
-
-                print(equation_f)
-                self.Answer.set(str(eval(equation_f)))
+                tokens = re.findall(r"\d+(?:\.\d+)?|sin|cos|tan|[+\-X/^()]", self.Equationbox.get())
+                print(tokens)
 
             case 9,0:
                 self.Equationbox.insert("insert","0")
