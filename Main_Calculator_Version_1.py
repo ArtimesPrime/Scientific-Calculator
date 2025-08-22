@@ -166,32 +166,57 @@ class calculator:
                 self.Equationbox.delete(pos - 1)
                 
             case 8,4:
-                tokens = re.findall(r"\d+(?:\.\d+)?|sin|cos|tan|[-+÷X/^()]", self.Equationbox.get())
-                priority = {"+":1, "-":1, "÷":2, "X":2, "^":3 }
+                tokens = re.findall(r"\d+(?:\.\d+)?|e|π|sin|cos|tan|[-+÷X/^()]", self.Equationbox.get())
+                priority = {"+":1, "-":1, "÷":2, "X":2, "^":3,}
                 postfix = []
                 operators = []
                 for i in tokens:
-                    if i.isdigit() == True:
+                    if re.match(r"\d+(?:\.\d+)?", i) is not None:
                         postfix.append(i)
-                    elif i in priority:
-                        while operators and i in priority and  priority[operators[-1]] >= priority[i]:
-                            postfix.append(operators.pop)
+                    elif i in ["+","-","÷","X","^"]:
+                        while operators and operators[-1] in priority and priority[operators[-1]] >= priority[i]:
+                            postfix.append(operators.pop())
                         operators.append(i)
+                    elif i == "e":
+                        print("fuck")
+                        postfix.append(str(math.e))
+                    elif i == "π":
+                        postfix.append(str(math.pi))
                     elif i == "(":
                         operators.append(i)
                     elif i == ")":
-                        while operators[-1] != "(":
-                            postfix.append(operators.pop)
+                        while operators and operators[-1] != "(":
+                            postfix.append(operators.pop())
                         operators.pop()
+                print(postfix)
                 postfix += operators[::-1]
-                print(postfix)    
+                output = []
+                for i in postfix:
+                    if re.match(r"\d+(?:\.\d+)?", i) is not None:
+                        output.append(i)
+                    else:
+                        print(output)
+                        num1 = float(output.pop())
+                        num2 = float(output.pop())
+                        if i == "+":
+                            output.append(num2+num1)
+                        elif i == "-":
+                            output.append(num2-num1)
+                        elif i == "X":
+                            output.append(num2*num1)
+                        elif i == "÷":
+                            output.append(num2/num1)
+
+                self.Answer.set(output)
+
+
 
 
 
             case 9,0:
                 self.Equationbox.insert("insert","0")
             case 9,1:
-                pass
+                self.Equationbox.insert("insert",".")
     
     # The GUI of the main calculator
     def Main_Calculator(self):
