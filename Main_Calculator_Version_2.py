@@ -166,14 +166,19 @@ class calculator:
                 self.Equationbox.delete(pos - 1)
                 
             case 8,4:
-                tokens = re.findall(r"\d+(?:\.\d+)?|e|\u221A|π|sin|cos|tan|Log|[-+÷X/^()]", self.Equationbox.get())
-                priority = {"+":1, "-":1, "÷":2, "X":2, "^":3, "\u221A":3, "Log":4}
+                tokens = re.findall(r"\d+(?:\.\d+)?|e|\u221A|π|sin|cos|tan|Log|Ln|[-+÷X/^()]", self.Equationbox.get())
+                for i in tokens:
+                    if i in {"Log", "Ln"} and re.match(r"\d+(?:\.\d+)?", i) is None:
+                        self.Answer.set("Syntax Error")
+                        return
+
+                priority = {"+":1, "-":1, "÷":2, "X":2, "^":3, "\u221A":3, "Log":4, "Ln":4}
                 postfix = []
                 operators = []
                 for i in tokens:
                     if re.match(r"\d+(?:\.\d+)?", i) is not None:
                         postfix.append(i)
-                    elif i in ["+","-","÷","X","^","\u221A", "Log"]:
+                    elif i in ["+","-","÷","X","^","\u221A", "Log", "Ln"]:
                         while operators and operators[-1] in priority and priority[operators[-1]] >= priority[i]:
                             postfix.append(operators.pop())
                         operators.append(i)
@@ -193,12 +198,15 @@ class calculator:
                 output = []
 
                 for i in postfix:
+
                     if re.match(r"\d+(?:\.\d+)?", i) is not None:
                         output.append(i)
-                    elif re.match(r"|sin|cos|tan|Log|", i) is not None:
+                    elif re.match(r"(sin|cos|tan|Log|Ln)", i) is not None:
+                        num3 = output.pop()
                         if i == "Log":
-                            num3 = output.pop()
                             output.append(math.log10(float(num3)))
+                        elif i == "Ln":
+                            output.append(math.log(float(num3)))
                     else:
                         print(output)
                         num1 = float(output.pop())
@@ -215,8 +223,8 @@ class calculator:
                             output.append(num1**(1/(num2)))
                         elif i == "^":
                             output.append(num2**num1)
-
-                self.Answer.set(output)
+                Final = output[0]
+                self.Answer.set(f"{Final:.8f}")
 
 
 
