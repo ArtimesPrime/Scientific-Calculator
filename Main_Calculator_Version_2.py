@@ -167,11 +167,6 @@ class calculator:
                 
             case 8,4:
                 tokens = re.findall(r"\d+(?:\.\d+)?|e|\u221A|π|sin|cos|tan|Log|Ln|[-+÷X/^()]", self.Equationbox.get())
-                for i in tokens:
-                    if i in {"Log", "Ln"} and re.match(r"\d+(?:\.\d+)?", i) is None:
-                        self.Answer.set("Syntax Error")
-                        return
-
                 priority = {"+":1, "-":1, "÷":2, "X":2, "^":3, "\u221A":3, "Log":4, "Ln":4}
                 postfix = []
                 operators = []
@@ -202,15 +197,24 @@ class calculator:
                     if re.match(r"\d+(?:\.\d+)?", i) is not None:
                         output.append(i)
                     elif re.match(r"(sin|cos|tan|Log|Ln)", i) is not None:
-                        num3 = output.pop()
+                        try:
+                            num3 = output.pop()
+                        except IndexError:
+                            self.Answer.set("Syntax Error")
+                            return
+                            
                         if i == "Log":
                             output.append(math.log10(float(num3)))
                         elif i == "Ln":
                             output.append(math.log(float(num3)))
                     else:
                         print(output)
-                        num1 = float(output.pop())
-                        num2 = float(output.pop())
+                        try:
+                            num1 = float(output.pop())
+                            num2 = float(output.pop())
+                        except IndexError:
+                            self.Answer.set("Syntax Error")
+                            return
                         if i == "+":
                             output.append(num2+num1)
                         elif i == "-":
@@ -223,6 +227,9 @@ class calculator:
                             output.append(num1**(1/(num2)))
                         elif i == "^":
                             output.append(num2**num1)
+                if len(output) > 1:
+                    self.Answer.set("Syntax Error")
+                    return
                 Final = output[0]
                 self.Answer.set(f"{Final:.8f}")
 
