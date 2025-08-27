@@ -20,9 +20,9 @@ class calculator:
         self.container = Frame(self.root)
         self.container.grid(row=0, column=0, sticky=NSEW)
 
-        self.TokenPattern = r"\d+(?:\.\d+)?|e|\u221A|π|sin|cos|tan|Log|Ln|sin\u207B\u00B9|cos\u207B\u00B9|tan\u207B\u00B9|[-+÷X/^()]"
+        self.TokenPattern = r"\d+(?:\.\d+)?|e|\u221A|π|(?:sin|cos|tan)(?:\u207B\u00B9)?|Log|Ln|[-+÷X/^()]"
         self.NumberPattern = r"\d+(?:\.\d+)?"
-        self.FunctionPattern = r"(sin|cos|tan|Log|Ln)"
+        self.FunctionPattern = r"((?:sin|cos|tan)(?:\u207B\u00B9)?|Log|Ln|u)"
 
 
         self.Operations = ["+","-","÷","X","^","\u221A", "Log", "Ln", "sin", "cos", "tan","sin\u207B\u00B9","cos\u207B\u00B9","tan\u207B\u00B9"]
@@ -132,11 +132,11 @@ class calculator:
             case 4,4:
                 self.Equationbox.insert("insert","e")
             case 5,0:
-                pass
+                self.Equationbox.insert("insert","sin\u207B\u00B9")
             case 5,1:
-                pass
+                self.Equationbox.insert("insert","cos\u207B\u00B9")
             case 5,2:
-                pass
+                self.Equationbox.insert("insert","tan\u207B\u00B9")
             case 5,3:
                 pass
             case 5,4:
@@ -177,12 +177,17 @@ class calculator:
                 priority = {"+":1, "-":1, "÷":2, "X":2,
                             "^":3, "\u221A":3, 
                             "Log":4, "Ln":4,
-                            "sin":4, "cos":4, "tan":4}
+                            "sin":4, "cos":4, "tan":4,
+                            "sin\u207B\u00B9":4, "cos\u207B\u00B9":4, "tan\u207B\u00B9":4
+                            }
                 postfix = []
                 operators = []
+                Last = None
                 for i in tokens:
                     if re.match(self.NumberPattern, i) is not None:
                         postfix.append(i)
+                    elif i == "-" and Last == None or Last in {"^", "("}:
+                        operators.append("u")
                     elif i in self.Operations:
                         while operators and operators[-1] in priority and priority[operators[-1]] >= priority[i]:
                             postfix.append(operators.pop())
@@ -197,7 +202,8 @@ class calculator:
                         while operators and operators[-1] != "(":
                             postfix.append(operators.pop())
                         operators.pop()
-                
+                    Last = i
+
                 postfix += operators[::-1]
                 print(postfix)
                 output = []
@@ -223,7 +229,15 @@ class calculator:
                             output.append(math.cos(float(num3)))
                         elif i == "tan":
                             output.append(math.tan(float(num3)))
-                        
+                        elif i == "sin\u207B\u00B9":
+                            output.append(math.asin(float(num3)))
+                        elif i == "cos\u207B\u00B9":
+                            output.append(math.acos(float(num3)))
+                        elif i == "tan\u207B\u00B9":
+                            output.append(math.atan(float(num3)))
+                        elif i == "u":
+                            output.append(-float(num3))
+
                     else:
                         print(output)
                         try:
@@ -248,7 +262,15 @@ class calculator:
                     self.Answer.set("Syntax Error")
                     return
                 Final = output[0]
-                self.Answer.set(f"{Final:.8f}")
+
+                if float(Final) > 10**16 or float(Final) < 10**-16:
+                    self.Answer.set("Math Error")
+                    return
+                
+                if Final > 1:
+                    self.Answer.set(Final)
+                else:
+                    self.Answer.set(Final)
 
 
 
@@ -271,7 +293,7 @@ class calculator:
         self.Equationbox = Entry(frame, width=50,)   
         self.Equationbox.grid(row=0, columnspan=5, padx=5, pady=0, sticky = "NSEW")
 
-        self.Answerbox = Label(frame, textvariable= self.Answer, width=43, bg="White", anchor="e")
+        self.Answerbox = Label(frame, textvariable= self.Answer, bg="White", anchor="e")
         self.Answerbox.grid(row=1, columnspan=5, padx=5, pady=0,  sticky = "NSEW")
 
         # Creates the main mass of buttons
@@ -300,7 +322,7 @@ class calculator:
                 self.PlaceButtons = Button(frame, text=self.Labels[(i,j)], width=5, command=lambda i=i, j=j: self.Operators(i, j))
                 self.PlaceButtons.grid(row=i, column=j, pady=3)
 
-        frame.grid(row=0, column=0)
+        frame.grid(row=0, column=0, sticky=NSEW)
         return frame
 
 
