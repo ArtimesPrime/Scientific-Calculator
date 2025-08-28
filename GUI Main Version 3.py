@@ -5,17 +5,12 @@ It will use for loops to create buttons and have a method of differentaiting whi
 18/07/25
 """
 
-
-
-
 from tkinter import *
 import math
 import re
 
-
 # The Class where all the calculator will be contained.
 class calculator:
-
 
     #Initalising and defineing the properties of the program.
     def __init__(self):
@@ -24,16 +19,11 @@ class calculator:
         self.container = Frame(self.root)
         self.container.grid(row=0, column=0, sticky=NSEW)
 
-
         self.TokenPattern = r"\d+(?:\.\d+)?|e|\u221A|π|(?:sin|cos|tan)(?:\u207B\u00B9)?|Log|Ln|[-+÷X/^()]"
         self.NumberPattern = r"-?\d+(?:\.\d+)?"
         self.FunctionPattern = r"((?:sin|cos|tan)(?:\u207B\u00B9)?|Log|Ln|u)"
 
-
-
-
         self.Operations = ["+","-","÷","X","^","\u221A", "Log", "Ln", "sin", "cos", "tan","sin\u207B\u00B9","cos\u207B\u00B9","tan\u207B\u00B9"]
-
 
         # Dictionary of the unique identifier of each button and its label.
         self.Labels = {
@@ -77,7 +67,8 @@ class calculator:
        
         self.Answer = StringVar()
         self.Answer.set("")
-
+        self.Quad = StringVar()
+        self.Quad.set("")
 
         # Creates the dictionary of the frames and creates the frames
         self.frames = {}
@@ -86,20 +77,13 @@ class calculator:
         self.frames["Simultaneous Solver"] = self.Simultaneous_Solver()
         self.frames["Menu"] = self.Menu()
 
-
         # Configures the window
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
-
         # Configures the container
         self.container.rowconfigure(0, weight=1)
         self.container.columnconfigure(0, weight=1)
-
-
-
-
-
 
         # Displays the main calculator on start up.
         self.show_frame("Main Calculator")
@@ -112,7 +96,7 @@ class calculator:
     def show_frame(self, name):
         frame = self.frames[name]
         frame.tkraise()
-    
+   
     def Quadratic_Evaluation(self):
         print("yay")
    
@@ -227,14 +211,11 @@ class calculator:
                         operators.pop()
                     Last = i
 
-
                 postfix += operators[::-1]
                 print(postfix)
                 output = []
 
-
                 for i in postfix:
-
 
                     if re.match(self.NumberPattern, i) is not None:
                         output.append(i)
@@ -276,7 +257,6 @@ class calculator:
                         elif i == "u":
                             output.append(-float(num3))
 
-
                     else:
                         print(output)
                         try:
@@ -316,14 +296,12 @@ class calculator:
                
                 self.Answer.set(Final)
 
-
             case 9,0:
                 self.Equationbox.insert("insert","0")
             case 9,1:
                 self.Equationbox.insert("insert",".")
-    
 
-    
+   
     # The GUI of the main calculator
     def Main_Calculator(self):
         # Defining the frames properties
@@ -331,16 +309,12 @@ class calculator:
         frame.rowconfigure([0,1,2,3,4,5,6,7,8,9], weight=1, minsize=30)
         frame.columnconfigure([0,1,2,3,4], weight=1, minsize=60)
 
-
-
         # Where the equation will be written
         self.Equationbox = Entry(frame, width=50,)  
         self.Equationbox.grid(row=0, columnspan=5, padx=5, pady=0, sticky = "NSEW")
 
-
         self.Answerbox = Label(frame, textvariable= self.Answer, bg="White", anchor="e")
         self.Answerbox.grid(row=1, columnspan=5, padx=5, pady=0,  sticky = "NSEW")
-
 
         # Creates the main mass of buttons
         for i in range(2, 6):
@@ -348,15 +322,11 @@ class calculator:
                 self.CenterButtons = Button(frame, text=self.Labels[(i,j)], width=5, command=lambda i=i, j=j: self.Operators(i, j))
                 self.CenterButtons.grid(row=i, column=j, pady=6)
        
-
-
         # Creates the Side buttons
         for i in range(6,9):
             for j in range(3,5):
                 self.RightButtons = Button(frame, text=self.Labels[(i,j)], width=5, command=lambda i=i, j=j: self.Operators(i, j))
                 self.RightButtons.grid(row=i, column=j, pady=3)
-
-
        
         # Creates the Numberpad
         for i in range(6,9):
@@ -364,17 +334,15 @@ class calculator:
                 self.NumButtons = Button(frame, text=self.Labels[(i,j)], width=5, height=2, command=lambda i=i, j=j: self.Operators(i, j))
                 self.NumButtons.grid(row=i, column=j, pady=3)
 
-
         # Creates the two buttons beneath the  numberpad.
         for i in range(9,10):
             for j in range(0,2):
                 self.PlaceButtons = Button(frame, text=self.Labels[(i,j)], width=5, command=lambda i=i, j=j: self.Operators(i, j))
                 self.PlaceButtons.grid(row=i, column=j, pady=3)
 
-
         frame.grid(row=0, column=0, sticky=NSEW)
         return frame
-    
+   
     def Menu(self):
         frame = Frame(self.container)
         frame.rowconfigure([0,1,2,3,4,5,6,7,8,9], weight=1, minsize=30)
@@ -387,15 +355,16 @@ class calculator:
         self.MainButton = Button(frame, text="Main Calculator", height=3, command=lambda: self.show_frame("Main Calculator"))
         self.MainButton.grid(row=2, sticky=NSEW)
 
+
         self.QuadraticButton = Button(frame, text="Quadratic Solver", height=3, command=lambda: self.show_frame("Quadratic Solver"))
         self.QuadraticButton.grid(row=4, sticky=NSEW)
 
+
         self.SimultaneousButton = Button(frame, text="Simultaneous Solver", height=3, command=lambda: self.show_frame("Simultaneous Solver"))
         self.SimultaneousButton.grid(row=6, sticky=NSEW)
-        
+       
         frame.grid(row=0, column=0, sticky=NSEW)
         return frame
-
 
     def Quadratic_Solver(self):
         # Defining the frames properties
@@ -409,8 +378,9 @@ class calculator:
                 self.coefficents[f"QuadEntry{i}"] = Entry(frame, width=9)
                 self.coefficents[f"QuadEntry{i}"].grid(row = 0, column=j, padx=3)
 
-        for j in range(0,5,5):
-            
+        self.QuadAnswerbox = Label(frame, textvariable= self.Quad, bg="White", anchor="w")
+        self.QuadAnswerbox.grid(row=1, columnspan=5, padx=5, pady=0,  sticky = "NSEW")
+           
 
         # Creates the main mass of buttons
         for i in range(2, 6):
@@ -419,23 +389,23 @@ class calculator:
                 self.CenterButtons.grid(row=i, column=j, pady=6)
        
 
-
         # Creates the Side buttons
         for i in range(6,9):
             for j in range(3,5):
                 self.RightButtons = Button(frame, text=self.Labels[(i,j)], width=5, command=lambda i=i, j=j: self.Operators(i, j))
                 self.RightButtons.grid(row=i, column=j, pady=3)
 
+
         self.NEWEXEButton = Button(frame, text="EXE", width = 5, command=lambda: self.Quadratic_Evaluation())
         self.NEWEXEButton.grid(row=8, column=4, pady=3)
+
 
         # Creates the Numberpad
         for i in range(6,9):
             for j in range(0,3):
                 self.NumButtons = Button(frame, text=self.Labels[(i,j)], width=5, height=2, command=lambda i=i, j=j: self.Operators(i, j))
                 self.NumButtons.grid(row=i, column=j, pady=3)
-        
-
+       
 
         # Creates the two buttons beneath the  numberpad.
         for i in range(9,10):
@@ -443,15 +413,13 @@ class calculator:
                 self.PlaceButtons = Button(frame, text=self.Labels[(i,j)], width=5, command=lambda i=i, j=j: self.Operators(i, j))
                 self.PlaceButtons.grid(row=i, column=j, pady=3)
 
-
         frame.grid(row=0, column=0, sticky=NSEW)
         return frame
 
 
     def Simultaneous_Solver(self):
         pass
-    
-
+   
 
 Calc = calculator()
 Calc.run()
