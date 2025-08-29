@@ -1,8 +1,10 @@
 """
-GUI for main Calculator.
-This version will include the GUI of the main calcultor as well as the function where the functional development will occur.
+GUI Main Version 2
+Built on  top of Main Calculator Version 3
+V1 Features: This version will include the GUI of the main calcultor as well as the function where the functional development will occur.
 It will use for loops to create buttons and have a method of differentaiting which button is which, to allow them to preform their function.
-18/07/25
+V2 Features: Menu And Navigation Between.
+By Ethan Beale
 """
 
 
@@ -372,19 +374,24 @@ class calculator:
         frame.grid(row=0, column=0, sticky=NSEW)
         return frame
     def Menu(self):
+        # Defining the frames properties
         frame = Frame(self.container)
         frame.rowconfigure([0,1,2,3,4,5,6,7,8,9], weight=1, minsize=30)
         frame.columnconfigure([0], weight=1, minsize=300)
 
+        # Title of Menu
         self.MenuTitle = Label(frame, text="Menu", font="Verdana 20 bold")
         self.MenuTitle.grid(row=0, sticky=NSEW)
 
+        # Main Calculator Button
         self.MainButton = Button(frame, text="Main Calculator", height=3, command=lambda: self.show_frame("Main Calculator"))
         self.MainButton.grid(row=2, sticky=NSEW)
 
+        # Quadratic Calculator Button
         self.QuadraticButton = Button(frame, text="Quadratic Solver", height=3, command=lambda: self.show_frame("Quadratic Solver"))
         self.QuadraticButton.grid(row=4, sticky=NSEW)
 
+        # simultaneous Calculator Button(Though Defunct kept as serves a purpose in future proofing.)
         self.SimultaneousButton = Button(frame, text="Simultaneous Solver", height=3, command=lambda: self.show_frame("Simultaneous Solver"))
         self.SimultaneousButton.grid(row=6, sticky=NSEW)
         

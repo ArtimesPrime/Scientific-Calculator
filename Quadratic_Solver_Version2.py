@@ -1,13 +1,15 @@
 """
-Quadratic Solver V1
-Built ontop of GUI Version 3
+Quadratic Solver V2
+Built ontop of GUI Version 3/ Quadratic Solver V 1
 V1 Features: Solves number coefficents and basic error prevention.
+V2 Features: Coefficents can be equations.
 By Ethan Beale
 """
 
-from tkinter import *
-import math
-import re
+
+from tkinter import * #Creates GUI
+import math # Preforms more advanced Math operations
+import re # Allows for regex patterns and search mathods
 
 
 # The Class where all the calculator will be contained.
@@ -21,12 +23,12 @@ class calculator:
         self.container = Frame(self.root)
         self.container.grid(row=0, column=0, sticky=NSEW)
 
-
+        # All Regex Patterns
         self.TokenPattern = r"\d+(?:\.\d+)?|e|\u221A|π|(?:sin|cos|tan)(?:\u207B\u00B9)?|Log|Ln|[-+÷X/^()]"
         self.NumberPattern = r"-?\d+(?:\.\d+)?"
         self.FunctionPattern = r"((?:sin|cos|tan)(?:\u207B\u00B9)?|Log|Ln|u)"
 
-
+        # Operators/Functions
         self.Operations = ["+","-","÷","X","^","\u221A", "Log", "Ln", "sin", "cos", "tan","sin\u207B\u00B9","cos\u207B\u00B9","tan\u207B\u00B9"]
 
 
@@ -107,19 +109,167 @@ class calculator:
         frame = self.frames[name]
         frame.tkraise()
         self.entry = None
-
     # Decides where buttons enter Text
     def setentry(self, event):
         self.entry = event.widget
-    
-    # Evaluates Quadratic Expression
+
+    # Solves Equations
+    def solve(self, equation):
+        # Creates a list from the equation that breaks at relevant segements.
+        tokens = re.findall(self.TokenPattern, equation)
+        # Facilitates Order of operations
+        priority = {"+":1, "-":1, "÷":2, "X":2,
+                    "^":3, "\u221A":3,
+                    "Log":4, "Ln":4,
+                    "sin":4, "cos":4, "tan":4,
+                    "sin\u207B\u00B9":4, "cos\u207B\u00B9":4, "tan\u207B\u00B9":4,
+                    "u":5
+                    }
+        # Postfix is output of the next block
+        postfix = []
+        # Stack that allows operators to be handled correctly.
+        operators = []
+        # Used to decide if a minus is uranary or not.
+        Last = None
+
+        # Turns Infix into Postifx
+        for i in tokens:
+            if re.match(self.NumberPattern, i) is not None:
+                postfix.append(i)
+            # Decides if a minus is uranary or not
+            elif i == "-" and (Last == None or Last in {"^", "(", "+", "-", "X", "÷", "\u00B2\u221A", "\u221A"}):
+                operators.append("u")
+            
+            elif i in self.Operations:
+                # This makes sure the operators are in the correct order.
+                while operators and operators[-1] in priority and priority[operators[-1]] >= priority[i]:
+                    postfix.append(operators.pop())
+                    print(postfix)
+                operators.append(i)
+                print(postfix)
+            # Detecting and adding constants
+            elif i == "e":
+                postfix.append(str(math.e))
+            elif i == "π":
+                postfix.append(str(math.pi))
+
+            # Handles bracket indentation
+            elif i == "(":
+                operators.append(i)
+                print(postfix)
+            elif i == ")":
+                while operators and operators[-1] != "(":
+                    postfix.append(operators.pop())
+                    print(postfix)
+                operators.pop()
+            Last = i
+
+        # Finalises the Postfix
+        postfix += operators[::-1]
+        # Stack used to evaluate postfix
+        output = []
+
+        # Evaluates Postfix and returns an Answer
+        for i in postfix:
+
+            if re.match(self.NumberPattern, i) is not None:
+                output.append(i)
+            # Handles Functions
+            elif re.match(self.FunctionPattern, i) is not None:
+                    # If there is no Number return an error
+                    num3 = output.pop()
+                    # If outside domain Return error.
+                    try:
+                        if i == "Log":
+                            output.append(math.log10(float(num3)))
+                        elif i == "Ln":
+                            output.append(math.log(float(num3)))
+
+                        elif i == "sin":
+                            output.append(math.sin(float(num3)))
+
+                        elif i == "cos":
+                            output.append(math.cos(float(num3)))
+
+                        elif i == "tan":
+                            output.append(math.tan(float(num3)))
+
+                        elif i == "sin\u207B\u00B9":
+                            output.append(math.asin(float(num3)))
+
+                        elif i == "cos\u207B\u00B9":
+                            output.append(math.acos(float(num3)))
+
+                        elif i == "tan\u207B\u00B9":
+                            output.append(math.atan(float(num3)))
+
+                        elif i == "u":
+                            output.append(-float(num3))
+                    except ValueError:
+                        self.Answer.set("Math Domain Error")
+            # Handles Basic Operators
+            else:
+                print(output)
+                try:
+                    num1 = float(output.pop())
+                    num2 = float(output.pop())
+                except IndexError:
+                    self.Answer.set("Syntax Error")
+                    return
+                if i == "+":
+                    output.append(num2+num1)
+                elif i == "-":
+                    output.append(num2-num1)
+                elif i == "X":
+                    output.append(num2*num1)
+                elif i == "÷":
+                    # Prevents Devide by 0 Error
+                    try:
+                        output.append(num2/num1)
+                    except ZeroDivisionError:
+                        self.Answer.set("Cant Divide by 0")
+                        return
+                elif i == "\u221A":
+                    # Prevents Negative roots
+                    if num1 < 0:
+                        self.Answer.set("Math Error: Copmplex Domain Not Supported")
+                        return
+                    output.append(num1**(1/(num2)))
+                elif i == "^":
+                    # Prevents Negative roots
+                    try:
+                        output.append(math.pow(num2, num1))
+                    except ValueError:
+                        self.Answer.set("Math Error: Complex Domain not Supported.")
+                        return
+        # Final Error Check
+        if len(output) > 1:
+            self.Answer.set("Syntax Error")
+            return
+        
+        Final = output[0]
+
+        # Makes Sure Output is within Bounduary
+        if float(Final) > 0:
+            if float(Final) >= 10**16 or float(Final) <= 10**-16:
+                self.Answer.set("Math Error")
+                return
+        else:
+            if float(Final) < -10**16:
+                self.Answer.set("Math Error")
+                return    
+        # Return Answer
+        return(Final)
+
+    # Solves Quadratics
     def Quadratic_Evaluation(self):
         # If a root cant be collected or turned into a float return an error
         try:
-            a = float(self.coefficents["a"].get())
-            b = float(self.coefficents["b"].get())
-            c = float(self.coefficents["c"].get())
-        except ValueError:
+            # Solve allows equations to be entered
+            a = float(self.solve(self.coefficents["a"].get()))
+            b = float(self.solve(self.coefficents["b"].get()))
+            c = float(self.solve(self.coefficents["c"].get()))
+        except Exception:
             self.Quad.set("Enter valid numbers for a, b, c")
             return
 
@@ -129,12 +279,10 @@ class calculator:
         except ValueError:
             self.Quad.set("No Real Roots")
             return
-
-
+        
+        # Outputs Roots
         root1 = (-b + Dis) / (2*a)
         root2 = (-b - Dis) / (2*a)
-
-        # Outputs Roots
         if root1 != root2:
             self.Quad.set(f"X = {root1} or X = {root2}")
         else:
@@ -143,12 +291,14 @@ class calculator:
 
     # Contains the operations preform by each button
     def Operators(self,r,c):
+        # Sets Where to enter.
         if self.entry is not None:
             entrypoint = self.entry
         else:
             entrypoint = self.Equationbox
         match(r,c):
             case 2,0:
+                # Every Line in this formatt does the same thing. Append to equationbox.
                 entrypoint.insert("insert","( )\u221A")
             case 2,1:
                 entrypoint.insert("insert","^2")
@@ -187,6 +337,7 @@ class calculator:
             case 5,3:
                 pass
             case 5,4:
+                # Clears Equation and Answer box
                 entrypoint.delete(0, END)
                 self.Answer.set("")
             case 6,0:
@@ -216,140 +367,21 @@ class calculator:
             case 8,2:
                 entrypoint.insert("insert","9")
             case 8,3:
+                # Deletes based on where the text pointer is.
                 pos = entrypoint.index(INSERT)
                 entrypoint.delete(pos - 1)
                
             case 8,4:
-                tokens = re.findall(self.TokenPattern, self.Equationbox.get())
-                priority = {"+":1, "-":1, "÷":2, "X":2,
-                            "^":3, "\u221A":3,
-                            "Log":4, "Ln":4,
-                            "sin":4, "cos":4, "tan":4,
-                            "sin\u207B\u00B9":4, "cos\u207B\u00B9":4, "tan\u207B\u00B9":4,
-                            "u":5
-                            }
-                postfix = []
-                operators = []
-                Last = None
-                for i in tokens:
-                    if re.match(self.NumberPattern, i) is not None:
-                        postfix.append(i)
-                    elif i == "-" and (Last == None or Last in {"^", "(", "+", "-", "X", "÷", "\u00B2\u221A", "\u221A"}):
-                        operators.append("u")
-                    elif i in self.Operations:
-                        while operators and operators[-1] in priority and priority[operators[-1]] >= priority[i]:
-                            postfix.append(operators.pop())
-                            print(postfix)
-                        operators.append(i)
-                        print(postfix)
-                    elif i == "e":
-                        postfix.append(str(math.e))
-                    elif i == "π":
-                        postfix.append(str(math.pi))
-                    elif i == "(":
-                        operators.append(i)
-                        print(postfix)
-                    elif i == ")":
-                        while operators and operators[-1] != "(":
-                            postfix.append(operators.pop())
-                            print(postfix)
-                        operators.pop()
-                    Last = i
-
-
-                postfix += operators[::-1]
-                print(postfix)
-                output = []
-
-
-                for i in postfix:
-
-
-                    if re.match(self.NumberPattern, i) is not None:
-                        output.append(i)
-                    elif re.match(self.FunctionPattern, i) is not None:
-                        try:
-                            num3 = output.pop()
-                        except IndexError:
-                            self.Answer.set("Syntax Error")
-                            return
-                       
-                        if i == "Log":
-                            output.append(math.log10(float(num3)))
-                        elif i == "Ln":
-                            output.append(math.log(float(num3)))
-                        elif i == "sin":
-                            output.append(math.sin(float(num3)))
-                        elif i == "cos":
-                            output.append(math.cos(float(num3)))
-                        elif i == "tan":
-                            output.append(math.tan(float(num3)))
-                        elif i == "sin\u207B\u00B9":
-                            try:
-                                output.append(math.asin(float(num3)))
-                            except ValueError:
-                                self.Answer.set("Domain Error")
-                                return
-                        elif i == "cos\u207B\u00B9":
-                            try:
-                                output.append(math.acos(float(num3)))
-                            except ValueError:
-                                self.Answer.set("Domain Error")
-                                return
-                        elif i == "tan\u207B\u00B9":
-                            try:
-                                output.append(math.atan(float(num3)))
-                            except ValueError:
-                                self.Answer.set("Domain Error")
-                                return
-                        elif i == "u":
-                            output.append(-float(num3))
-
-
-                    else:
-                        print(output)
-                        try:
-                            num1 = float(output.pop())
-                            num2 = float(output.pop())
-                        except IndexError:
-                            self.Answer.set("Syntax Error")
-                            return
-                        if i == "+":
-                            output.append(num2+num1)
-                        elif i == "-":
-                            output.append(num2-num1)
-                        elif i == "X":
-                            output.append(num2*num1)
-                        elif i == "÷":
-                            output.append(num2/num1)
-                        elif i == "\u221A":
-                            if num1 < 0:
-                                self.Answer.set("Math Error: Copmplex Domain Not Supported")
-                                return
-                            output.append(num1**(1/(num2)))
-                        elif i == "^":
-                            output.append(num2**num1)
-                if len(output) > 1:
-                    self.Answer.set("Syntax Error")
-                    return
-                Final = output[0]
-                print(Final)
-                if float(Final) > 0:
-                    if float(Final) >= 10**16 or float(Final) <= 10**-16:
-                        self.Answer.set("Math Error")
-                        return
-                else:
-                    if float(Final) < -10**16:
-                        self.Answer.set("Math Error")
-                        return    
-               
-                self.Answer.set(Final)
+                # Preforms Calculation
+                Final_Answer = (self.solve(entrypoint.get()))    
+                if Final_Answer != None:
+                    self.Answer.set(Final_Answer)  
 
 
             case 9,0:
-                self.Equationbox.insert("insert","0")
+                entrypoint.insert("insert","0")
             case 9,1:
-                self.Equationbox.insert("insert",".")
+                entrypoint.insert("insert",".")
    
 
     # The GUI of the main calculator
@@ -364,7 +396,7 @@ class calculator:
         self.Equationbox = Entry(frame, width=50,)  
         self.Equationbox.grid(row=0, columnspan=5, padx=5, pady=0, sticky = "NSEW")
 
-
+        # Contains the Answer
         self.Answerbox = Label(frame, textvariable= self.Answer, bg="White", anchor="e")
         self.Answerbox.grid(row=1, columnspan=5, padx=5, pady=0,  sticky = "NSEW")
 
@@ -396,35 +428,36 @@ class calculator:
                 self.PlaceButtons = Button(frame, text=self.Labels[(i,j)], width=5, command=lambda i=i, j=j: self.Operators(i, j))
                 self.PlaceButtons.grid(row=i, column=j, pady=3)
 
-
         frame.grid(row=0, column=0, sticky=NSEW)
         return frame
-   
+    
+    # GUI of Menu
     def Menu(self):
+        # Defining the frames properties
         frame = Frame(self.container)
         frame.rowconfigure([0,1,2,3,4,5,6,7,8,9], weight=1, minsize=30)
         frame.columnconfigure([0], weight=1, minsize=300)
 
-
+        # Title of Menu
         self.MenuTitle = Label(frame, text="Menu", font="Verdana 20 bold")
         self.MenuTitle.grid(row=0, sticky=NSEW)
 
-
+        # Main Calculator Button
         self.MainButton = Button(frame, text="Main Calculator", height=3, command=lambda: self.show_frame("Main Calculator"))
         self.MainButton.grid(row=2, sticky=NSEW)
 
-
+        # Quadratic Calculator Button
         self.QuadraticButton = Button(frame, text="Quadratic Solver", height=3, command=lambda: self.show_frame("Quadratic Solver"))
         self.QuadraticButton.grid(row=4, sticky=NSEW)
 
-
+        # simultaneous Calculator Button(Though Defunct kept as serves a purpose in future proofing.)
         self.SimultaneousButton = Button(frame, text="Simultaneous Solver", height=3, command=lambda: self.show_frame("Simultaneous Solver"))
         self.SimultaneousButton.grid(row=6, sticky=NSEW)
        
         frame.grid(row=0, column=0, sticky=NSEW)
         return frame
 
-
+    # GUI of Quadratic Solver
     def Quadratic_Solver(self):
         # Defining the frames properties
         frame = Frame(self.container)
@@ -432,14 +465,14 @@ class calculator:
         frame.columnconfigure([0,1,2,3,4], weight=1, minsize=30)
         self.coefficents={}
 
-        # Entry Boxes
+
         labels = ["a", "b", "c"]
         for i, lbl in enumerate(labels):
             self.coefficents[lbl] = Entry(frame, width=9)
-            self.coefficents[lbl].grid(row=0, column=i*2, padx=3)
+            self.coefficents[lbl].grid(row=0, column=i*2, padx=3, sticky="NEW")
             self.coefficents[lbl].bind("<FocusIn>", self.setentry)
 
-        # Answer Box
+
         self.QuadAnswerbox = Label(frame, textvariable= self.Quad, bg="White", anchor="w")
         self.QuadAnswerbox.grid(row=1, columnspan=5, padx=5, pady=0,  sticky = "NSEW")
            
@@ -475,8 +508,10 @@ class calculator:
                 self.PlaceButtons = Button(frame, text=self.Labels[(i,j)], width=5, command=lambda i=i, j=j: self.Operators(i, j))
                 self.PlaceButtons.grid(row=i, column=j, pady=3)
 
+
         frame.grid(row=0, column=0, sticky=NSEW)
         return frame
+
 
     def Simultaneous_Solver(self):
         pass

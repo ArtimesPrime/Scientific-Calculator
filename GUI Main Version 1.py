@@ -3,6 +3,7 @@ GUI for main Calculator.
 This version will include the GUI of the main calcultor as well as the function where the functional development will occur.
 It will use for loops to create buttons and have a method of differentaiting which button is which, to allow them to preform their function.
 18/07/25
+By Ethan Beale
 """
 
 

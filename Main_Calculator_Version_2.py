@@ -1,14 +1,14 @@
 """
-GUI for main Calculator.
-This version will include the GUI of the main calcultor as well as the function where the functional development will occur.
-It will use for loops to create buttons and have a method of differentaiting which button is which, to allow them to preform their function.
-18/07/25
-"""
+Main Calculator Version 2
+Built ontop of Version 1 of GUI which explains similar Comments
+and Version 1 of Main Calculator
+V1 Featues: Basic operators and Constants
+V2 Features: Log ,Exponents and Preliminary Error Prevention
+By Ethan Beale"""
 
-
-from tkinter import *
-import math
-import re
+from tkinter import * #Creates GUI
+import math # Preforms more advanced Math operations
+import re # Allows for regex patterns and search mathods
 
 # The Class where all the calculator will be contained.
 class calculator:
@@ -95,6 +95,7 @@ class calculator:
     def Operators(self,r,c):
         match(r,c):
             case 2,0:
+                # Every Line in this formatt does the same thing. Append to equationbox.
                 self.Equationbox.insert("insert","( )\u221A")
             case 2,1:
                 self.Equationbox.insert("insert","^2")
@@ -133,6 +134,7 @@ class calculator:
             case 5,3:
                 pass
             case 5,4:
+                # Clears Equation and Answer box
                 self.Equationbox.delete(0, END)
                 self.Answer.set("")
             case 6,0:
@@ -162,53 +164,74 @@ class calculator:
             case 8,2:
                 self.Equationbox.insert("insert","9")
             case 8,3:
+                # Deletes based on where the text pointer is.
                 pos = self.Equationbox.index(INSERT)
                 self.Equationbox.delete(pos - 1)
                 
             case 8,4:
+                # Creates a list from the equation that breaks at relevant segements.
                 tokens = re.findall(r"\d+(?:\.\d+)?|e|\u221A|π|sin|cos|tan|Log|Ln|[-+÷X/^()]", self.Equationbox.get())
+                # Facilitates Order of operations
                 priority = {"+":1, "-":1, "÷":2, "X":2, "^":3, "\u221A":3, "Log":4, "Ln":4}
+                # Postfix is output of the next block
                 postfix = []
+
+                # Stack that allows operators to be handled correctly.
                 operators = []
+
+                # Turns Infix into Postifx
                 for i in tokens:
                     if re.match(r"\d+(?:\.\d+)?", i) is not None:
                         postfix.append(i)
                     elif i in ["+","-","÷","X","^","\u221A", "Log", "Ln"]:
+                        # This makes sure the operators are in the correct order.
                         while operators and operators[-1] in priority and priority[operators[-1]] >= priority[i]:
                             postfix.append(operators.pop())
                         operators.append(i)
+                    # Detecting and adding constants
                     elif i == "e":
                         postfix.append(str(math.e))
                     elif i == "π":
                         postfix.append(str(math.pi))
+
+                    # Handles bracket indentation
                     elif i == "(":
                         operators.append(i)
                     elif i == ")":
                         while operators and operators[-1] != "(":
                             postfix.append(operators.pop())
                         operators.pop()
-                
+
+                # Finalises the Postfix
                 postfix += operators[::-1]
-                print(postfix)
+
+                # Stack used to evaluate postfix
                 output = []
 
+                # Evaluates Postfix and sets an Answer
                 for i in postfix:
-
                     if re.match(r"\d+(?:\.\d+)?", i) is not None:
                         output.append(i)
+                    
+                    # Handles Functions
                     elif re.match(r"(sin|cos|tan|Log|Ln)", i) is not None:
+                        # If there is no Number return an error
                         try:
                             num3 = output.pop()
                         except IndexError:
                             self.Answer.set("Syntax Error")
                             return
-                            
+
+
+
                         if i == "Log":
                             output.append(math.log10(float(num3)))
                         elif i == "Ln":
                             output.append(math.log(float(num3)))
+                    
+                    # Handles Basic Operators
                     else:
-                        print(output)
+                        # If a Number is missing return an error
                         try:
                             num1 = float(output.pop())
                             num2 = float(output.pop())
@@ -227,9 +250,12 @@ class calculator:
                             output.append(num1**(1/(num2)))
                         elif i == "^":
                             output.append(num2**num1)
+                # Final Error Check
                 if len(output) > 1:
                     self.Answer.set("Syntax Error")
                     return
+                
+                # Set answer and formatt
                 Final = output[0]
                 self.Answer.set(f"{Final:.8f}")
 

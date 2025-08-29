@@ -1,14 +1,14 @@
 """
-GUI for main Calculator.
-This version will include the GUI of the main calcultor as well as the function where the functional development will occur.
-It will use for loops to create buttons and have a method of differentaiting which button is which, to allow them to preform their function.
-18/07/25
+Main Calculator Version 1
+Built ontop of Version 1 of GUI which explains Similar Comments
+V1 Features: Basic Operators and Constants
+By Ethan Beale
 """
 
 
-from tkinter import *
-import math
-import re
+from tkinter import * # Crates GUI
+import math # Profroms the more Advanced math oprtations
+import re # Allows the creations of regex patterns
 
 # The Class where all the calculator will be contained.
 class calculator:
@@ -97,6 +97,7 @@ class calculator:
             case 2,0:
                 pass
             case 2,1:
+                # Every Line in this formatt does the same thing. Append to equationbox.
                 self.Equationbox.insert("insert","\u00B2")
             case 2,2:
                 self.Equationbox.insert("insert","Log")
@@ -133,6 +134,7 @@ class calculator:
             case 5,3:
                 pass
             case 5,4:
+                # Clears Equation and Answer box
                 self.Equationbox.delete(0, END)
                 self.Answer.set("")
             case 6,0:
@@ -162,35 +164,50 @@ class calculator:
             case 8,2:
                 self.Equationbox.insert("insert","9")
             case 8,3:
+                # Deletes based on where the text pointer is.
                 pos = self.Equationbox.index(INSERT)
                 self.Equationbox.delete(pos - 1)
                 
             case 8,4:
+                # Creates a list from the equation that breaks at relevant segements.
                 tokens = re.findall(r"\d+(?:\.\d+)?|e|π|sin|cos|tan|[-+÷X/^()]", self.Equationbox.get())
+                # Facilitates Order of operations
                 priority = {"+":1, "-":1, "÷":2, "X":2, "^":3,}
+
+                # Postfix is output of the next block
                 postfix = []
+
+                # Stack that allows operators to be handled correctly.
                 operators = []
                 for i in tokens:
                     if re.match(r"\d+(?:\.\d+)?", i) is not None:
                         postfix.append(i)
                     elif i in ["+","-","÷","X","^"]:
+                        # This makes sure the operators are in the correct order.
                         while operators and operators[-1] in priority and priority[operators[-1]] >= priority[i]:
                             postfix.append(operators.pop())
                         operators.append(i)
+                    # Detecting and adding constants
                     elif i == "e":
-                        print("fuck")
                         postfix.append(str(math.e))
                     elif i == "π":
                         postfix.append(str(math.pi))
+
+                    # Handles bracket indentation
                     elif i == "(":
                         operators.append(i)
                     elif i == ")":
                         while operators and operators[-1] != "(":
                             postfix.append(operators.pop())
                         operators.pop()
-                print(postfix)
+
+                # Finalises the Postfix
                 postfix += operators[::-1]
+
+                # Stack used to evaluate postfix
                 output = []
+
+                # Evaluates Postfix and sets an Answer
                 for i in postfix:
                     if re.match(r"\d+(?:\.\d+)?", i) is not None:
                         output.append(i)
@@ -208,10 +225,6 @@ class calculator:
                             output.append(num2/num1)
 
                 self.Answer.set(output)
-
-
-
-
 
             case 9,0:
                 self.Equationbox.insert("insert","0")
@@ -270,8 +283,6 @@ class calculator:
 
     def Simultaneous_Solver(self):
         pass
-
-
 
 
 Calc = calculator()

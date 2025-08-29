@@ -1,16 +1,17 @@
 """
-GUI for main Calculator.
-This version will include the GUI of the main calcultor as well as the function where the functional development will occur.
-It will use for loops to create buttons and have a method of differentaiting which button is which, to allow them to preform their function.
-18/07/25
-"""
+Main Calculator Version 3
+Built ontop of Version 1 of GUI which explains similar Comments
+and Version 2 of Main Calculator
+V1 Featues: Basic operators and Constants
+V2 Features: Log ,Exponents and Preliminary Error Prevention
+V3 Features: Comprehensive Error prevention and Trigonometric Functions
+By Ethan Beale"""
 
 
 
-
-from tkinter import *
-import math
-import re
+from tkinter import * #Creates GUI
+import math # Preforms more advanced Math operations
+import re # Allows for regex patterns and search mathods
 
 
 # The Class where all the calculator will be contained.
@@ -25,13 +26,14 @@ class calculator:
         self.container.grid(row=0, column=0, sticky=NSEW)
 
 
+        # All Regex Patterns
         self.TokenPattern = r"\d+(?:\.\d+)?|e|\u221A|π|(?:sin|cos|tan)(?:\u207B\u00B9)?|Log|Ln|[-+÷X/^()]"
         self.NumberPattern = r"-?\d+(?:\.\d+)?"
         self.FunctionPattern = r"((?:sin|cos|tan)(?:\u207B\u00B9)?|Log|Ln|u)"
 
 
 
-
+        # Operators/Functions
         self.Operations = ["+","-","÷","X","^","\u221A", "Log", "Ln", "sin", "cos", "tan","sin\u207B\u00B9","cos\u207B\u00B9","tan\u207B\u00B9"]
 
 
@@ -116,6 +118,7 @@ class calculator:
     def Operators(self,r,c):
         match(r,c):
             case 2,0:
+                # Every Line in this formatt does the same thing. Append to equationbox.
                 self.Equationbox.insert("insert","( )\u221A")
             case 2,1:
                 self.Equationbox.insert("insert","^2")
@@ -154,6 +157,7 @@ class calculator:
             case 5,3:
                 pass
             case 5,4:
+                # Clears Equation and Answer box
                 self.Equationbox.delete(0, END)
                 self.Answer.set("")
             case 6,0:
@@ -183,11 +187,14 @@ class calculator:
             case 8,2:
                 self.Equationbox.insert("insert","9")
             case 8,3:
+                # Deletes based on where the text pointer is.
                 pos = self.Equationbox.index(INSERT)
                 self.Equationbox.delete(pos - 1)
                
             case 8,4:
+                # Creates a list from the equation that breaks at relevant segements.
                 tokens = re.findall(self.TokenPattern, self.Equationbox.get())
+                # Facilitates Order of operations
                 priority = {"+":1, "-":1, "÷":2, "X":2,
                             "^":3, "\u221A":3,
                             "Log":4, "Ln":4,
@@ -195,24 +202,37 @@ class calculator:
                             "sin\u207B\u00B9":4, "cos\u207B\u00B9":4, "tan\u207B\u00B9":4,
                             "u":5
                             }
+                # Postfix is output of the next block
                 postfix = []
+                # Stack that allows operators to be handled correctly.
                 operators = []
+                # Used to decide if a minus is uranary or not.
                 Last = None
+
+                # Turns Infix into Postifx
                 for i in tokens:
                     if re.match(self.NumberPattern, i) is not None:
                         postfix.append(i)
+                    
+                    # Decides if a minus is uranary or not
                     elif i == "-" and (Last == None or Last in {"^", "(", "+", "-", "X", "÷", "\u00B2\u221A", "\u221A"}):
                         operators.append("u")
+
+
                     elif i in self.Operations:
+                        # This makes sure the operators are in the correct order.
                         while operators and operators[-1] in priority and priority[operators[-1]] >= priority[i]:
                             postfix.append(operators.pop())
                             print(postfix)
                         operators.append(i)
-                        print(postfix)
+                    
+                    # Detecting and adding constants
                     elif i == "e":
                         postfix.append(str(math.e))
                     elif i == "π":
                         postfix.append(str(math.pi))
+
+                    # Handles bracket indentation
                     elif i == "(":
                         operators.append(i)
                         print(postfix)
@@ -223,18 +243,20 @@ class calculator:
                         operators.pop()
                     Last = i
 
-
+                # Finalises the Postfix
                 postfix += operators[::-1]
-                print(postfix)
+
+                # Stack used to evaluate postfix
                 output = []
 
-
+                # Evaluates Postfix and sets an Answer
                 for i in postfix:
-
-
                     if re.match(self.NumberPattern, i) is not None:
                         output.append(i)
+
+                    # Handles Functions
                     elif re.match(self.FunctionPattern, i) is not None:
+                        # If there is no Number return an error
                         try:
                             num3 = output.pop()
                         except IndexError:
@@ -292,7 +314,7 @@ class calculator:
                         elif i == "u":
                             output.append(-float(num3))
 
-
+                    # Handles Basic Operators
                     else:
                         print(output)
                         try:
@@ -310,15 +332,18 @@ class calculator:
                         elif i == "÷":
                             output.append(num2/num1)
                         elif i == "\u221A":
+                            # Prevents Negative roots
                             if num1 < 0:
                                 self.Answer.set("Math Error: Copmplex Domain Not Supported")
                                 return
                             output.append(num1**(1/(num2)))
                         elif i == "^":
                             output.append(num2**num1)
+                # Final Error Check
                 if len(output) > 1:
                     self.Answer.set("Syntax Error")
                     return
+                # Makes Sure Output is within Bounduary
                 Final = output[0]
                 print(Final)
                 if float(Final) > 0:
@@ -329,7 +354,7 @@ class calculator:
                     if float(Final) < -10**16:
                         self.Answer.set("Math Error")
                         return    
-               
+               # Outputs Answer
                 self.Answer.set(Final)
 
 
